@@ -36,36 +36,21 @@ public class Wordle {
     public static void computeFeedback(String secret, String guess, char[] resultRow) {
 		char[] secretarr = secret.toCharArray();
         char[] guessarr = guess.toCharArray();
-        //checks the 'G' value feedback
+        //generates values for resultRow
         for(int i=0;i<guessarr.length;i++)
         {
          for(int j=0;j<secretarr.length;j++)
          {
-          if (guessarr[i]==secretarr[i]) { 
+          if (guessarr[i]==secretarr[j] && i==j) { 
             resultRow[i] = 'G';
-            guessarr[i] = '.'; // if found, change the values. prevents multiple counting
-            secretarr[i] = ',';  // if found, change the values. prevents multiple counting
+          }
+          if (guessarr[i]==secretarr[j] && i!=j) { 
+            resultRow[i] = 'Y';
+          }
+          else{
+            resultRow[i] ='_';
           }
          }
-        }
-        //checks the 'Y' value feedback
-        for(int k=0;k<guessarr.length;k++)
-        {
-         for(int l=0;l<secretarr.length;l++)
-         {
-          if (guessarr[k] == secretarr[l]) {
-            resultRow[k] = 'Y';
-            guessarr[k] = '.'; // if found, change the values. prevents multiple counting
-            secretarr[l] = ',';  // if found, change the values. prevents multiple counting
-          }
-         }
-        }
-        //if not 'Y' or 'G', then '_'
-        for(int p=0;p<resultRow.length;p++)
-        {
-          if (resultRow[p] != 'Y' && resultRow[p] != 'G') {
-            resultRow[p] = '_';
-          }
         }    
     }
     
