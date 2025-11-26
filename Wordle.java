@@ -2,27 +2,73 @@ public class Wordle {
 
     // Reads all words from dictionary filename into a String array.
     public static String[] readDictionary(String filename) {
-		// ...
-    }
+        In in = new In("dictionary.txt"); // extracting the words in dictionary         
+        String allWords = in.readAll();        // creating a string which contains the words        
+        String[] dictionary = allWords.split("\\R"); // creating an array
+        return dictionary;
+    }       
+    
 
     // Choose a random secret word from the dictionary. 
     // Hint: Pick a random index between 0 and dict.length (not including) using Math.random()
-    public static String chooseSecretWord(String[] dict) {
-		// ...
+    public static String chooseSecretWord(String[] dict){
+	  String secret = dict[(int)(Math.random()*dict.length)]; // generates a number 5 letter word
+      return secret;
     }
 
     // Simple helper: check if letter c appears anywhere in secret (true), otherwise
     // return false.
     public static boolean containsChar(String secret, char c) {
-		// ...
+
+		char[] arr1 = new char[secret.length()];
+        arr1 = secret.toCharArray();
+        for(int i=0; i<arr1.length;i++){
+         if (arr1[i] == c) { // if 'c' is in secret
+            return true; // returns for the first apperence, thus we must send to the function the word the player wrote without
+         }               // the charachters we already checked
+        }
+        
+        return false;
     }
 
     // Compute feedback for a single guess into resultRow.
     // G for exact match, Y if letter appears anywhere else, _ otherwise.
     public static void computeFeedback(String secret, String guess, char[] resultRow) {
-		// ...
-		// you may want to use containsChar in your implementation
+		char[] secretarr = secret.toCharArray();
+        char[] guessarr = guess.toCharArray();
+        //checks the 'G' value feedback
+        for(int i=0;i<guessarr.length;i++)
+        {
+         for(int j=0;j<secretarr.length;j++)
+         {
+          if (guessarr[i]==secretarr[i]) { 
+            resultRow[i] = 'G';
+            guessarr[i] = '.'; // if found, change the values. prevents multiple counting
+            secretarr[i] = ',';  // if found, change the values. prevents multiple counting
+          }
+         }
+        }
+        //checks the 'Y' value feedback
+        for(int k=0;k<guessarr.length;k++)
+        {
+         for(int l=0;l<secretarr.length;l++)
+         {
+          if (guessarr[k] == secretarr[l]) {
+            resultRow[k] = 'Y';
+            guessarr[k] = '.'; // if found, change the values. prevents multiple counting
+            secretarr[l] = ',';  // if found, change the values. prevents multiple counting
+          }
+         }
+        }
+        //if not 'Y' or 'G', then '_'
+        for(int p=0;p<resultRow.length;p++)
+        {
+          if (resultRow[p] != 'Y' && resultRow[p] != 'G') {
+            resultRow[p] = '_';
+          }
+        }    
     }
+    
 
     // Store guess string (chars) into the given row of guesses 2D array.
     // For example, of guess is HELLO, and row is 2, then after this function 
@@ -33,7 +79,12 @@ public class Wordle {
 	// guesses[2][3] // 'L'
 	// guesses[2][4] // 'O'
     public static void storeGuess(String guess, char[][] guesses, int row) {
-		// ...
+		char [] arr1 = new char[guess.length()];
+        arr1 = guess.toCharArray();
+        for(int i=0;i<arr1.length;i++)
+        {
+            guesses[row][i] = arr1[i];
+        }
     }
 
     // Prints the game board up to currentRow (inclusive).
@@ -55,7 +106,13 @@ public class Wordle {
 
     // Returns true if all entries in resultRow are 'G'.
     public static boolean isAllGreen(char[] resultRow) {
-		// ...
+        for(int i=0;i<resultRow.length;i++)
+        {
+            if (resultRow[i] !='G') {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static void main(String[] args) {
@@ -70,12 +127,11 @@ public class Wordle {
         String secret = chooseSecretWord(dict);
 
         // Prepare 2D arrays for guesses and results
-        char[][] guesses = // ...
-        char[][] results = // ...
+        char[][] guesses = new char[MAX_ATTEMPTS][WORD_LENGTH]; 
+        char[][] results = new char[MAX_ATTEMPTS][WORD_LENGTH];
 
         // Prepare to read from the standart input 
         In inp = new In();
-
         int attempt = 0;
         boolean won = false;
 
@@ -87,17 +143,20 @@ public class Wordle {
             // Loop until you read a valid guess
             while (!valid) {
                 System.out.print("Enter your guess (5-letter word): ");
-                guess = // ... read from the standrad input
-                
-                if (/* ... check if the guess is valid */) {
+                guess = inp.readString();
+                if (guess.length() != WORD_LENGTH || !guess.matches("[a-zA-Z]+")) { //checks the validity of the input
                     System.out.println("Invalid word. Please try again.");
                 } else {
+                    guess = guess.toUpperCase(); // turns guess to upper case
                     valid = true;
                 }
             }
 
             // Store guess and compute feedback
-            // ... use storeGuess and computeFeedback
+            
+            storeGuess(guess,guesses,attempt);
+
+            computeFeedback(secret, guess, results[attempt]);
 
             // Print board
             printBoard(guesses, results, attempt);
@@ -106,13 +165,14 @@ public class Wordle {
             if (isAllGreen(results[attempt])) {
                 System.out.println("Congratulations! You guessed the word in " + (attempt + 1) + " attempts.");
                 won = true;
+                break;
             }
 
             attempt++;
         }
-
-        if (!won) {
-            // ... follow the assignment examples for how the printing should look like
+        //  
+        if (!won) { 
+         System.out.println("Sorry, you did not guess the word.\nThe secret word was: " + secret);
         }
 
         inp.close();
