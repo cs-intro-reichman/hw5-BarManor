@@ -36,21 +36,25 @@ public class Wordle {
     public static void computeFeedback(String secret, String guess, char[] resultRow) {
 		char[] secretarr = secret.toCharArray();
         char[] guessarr = guess.toCharArray();
+        boolean isInSecret = false;
         //generates values for resultRow
         for(int i=0;i<guessarr.length;i++)
         {
+         isInSecret = false;
          for(int j=0;j<secretarr.length;j++)
          {
-          if (guessarr[i]==secretarr[j] && i==j) { 
+          if (guessarr[i]==secretarr[i]) { 
             resultRow[i] = 'G';
+            isInSecret =true;
           }
-          if (guessarr[i]==secretarr[j] && i!=j) { 
+          if ((guessarr[i]==secretarr[j]) && (i!=j)) { 
             resultRow[i] = 'Y';
-          }
-          else{
-            resultRow[i] ='_';
+            isInSecret =true;
           }
          }
+        if (!isInSecret) {
+            resultRow[i] = '_';
+        }
         }    
     }
     
